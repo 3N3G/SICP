@@ -36,20 +36,20 @@ Exercise 1.5
 If the interpreter uses applicative-order evaluation then the procedure will just return zero. If it uses normal-order evaluation, then the interpreter will try to figure out what y is, which is p, which loops back to itself infinitely, causing a dead loop
 
 Exercise 1.6
-When Alyssa attempts to use this to compute square roots, it may get stuck in an infinite loop, as the third argument of new-if is another sqrt-iter, meaning the computer will get stuck in a recursive unending cycle.
+When Alyssa attempts to use this to compute square roots, it may get stuck in an infinite loop, as the third argument of new-if is another sqrt-iter, meaning the computer will get stuck in a recursive unending cycle. "if" doesn't have this problem, since if the condition is true it doesn't check the false case.
 
 Exercise 1.7
 Because good-enough uses a constant error, it will fail for small numbers. If, say, the error allowance is 0.001, then if the answer is 0.00001, then a guess could be 100 times the correct answer and good-enough would still return true! For large numbers, any iterative process may go in jumps too large for good enough. A guess may cycle between 100 and 101, always more than the error of 0.01 from the correct answer 100.5
 Here is an implemented square root function that uses the decreasing change in "guess" to determine if the guess is good enough:
 """
-def goodenough (guess, x, lastguess):
-    if (abs((guess - lastguess)/guess) < 0.01):
-        return True
-    return False
+def goodenough (guess, x, lastguess, acceptederror):
+    return (abs((guess - lastguess)/guess) < acceptederror)
 
-def sqriter (guess, x, lastguess):
+def sqriter (guess, x, lastguess, acceptederror):
     # print(str(guess) + ", " + str(x) + ", " + str(lastguess))
-    if (goodenough(guess, x, lastguess)):
+    if (guess == 0):
+        return 1 # not super sure why 1 should be returned when guess is 0
+    if (goodenough(guess, x, lastguess, acceptederror)):
         return guess
     else:
         return sqriter(0.5*(guess+x/guess), x, guess)
@@ -58,7 +58,9 @@ def sqrter (x):
     if (x<0):
         print("No square rooting negatives")
         return
-    return sqriter(1,x,2*x)
+    elif (x == 0):
+        return 0
+    return sqriter(1,x,2*x, 0.01)
 
 #print(sqrter(19239))  # correct is 138.7
 #print(sqrter(0.0001)) # correct is 0.01
@@ -66,15 +68,15 @@ def sqrter (x):
 """
 Exercise 1.8
 """
-def cbiter (guess, x, lastguess):
-    if (goodenough(guess, x, lastguess)):
+def cbiter (guess, x, lastguess, acceptederror): # cube root is defined for negative numbers
+    if (goodenough(guess, x, lastguess, acceptederror)):
         return guess
     else:
-        return cbiter((2*guess+x/guess**2)/3, x, guess)
+        return cbiter((2*guess+x/guess**2)/3, x, guess, acceptederror)
 def cbrter (x):
-    return cbiter(1,x,2*x)
+    return cbiter(1,x,2*x, 0.01)
 #print(cbrter(27))
-#print(cbrter(-1))
+print(cbrter(-1))
 
 """
 Exercise 1.9
@@ -124,6 +126,9 @@ def recursivef(n):
         return n
     return recursivef(n-1)+2*recursivef(n-2)+3*recursivef(n-3)
 
+"""
+First a recursive program similar to one in the book that would be considered as iterative as lisp can do, except in Python:
+"""
 def fiter(n,i,oneprev,twoprev,threeprev):
     if n==i:
         return oneprev + 2*twoprev + 3*threeprev
@@ -134,6 +139,11 @@ def iterativef(n):
     if n<3:
         return n
     return fiter(n,3,2,1,0)
+"""
+Actual iterative program:
+"""
+
+
 
 """
 Exercise 1.12
@@ -145,6 +155,8 @@ def recursivePascal(i,j):
         return 1
     if i == j:
         return 1
+    if i > j or i < 0 or j < 0:
+        return 0
     else:
         return recursivePascal(i-1,j-1) + recursivePascal(i-1,j)
 
@@ -172,7 +184,22 @@ a) 7 times because 12.15/3^7<0.01 but 12.15/3^6>0.01
 b) on the order of log(a)
 """
 
+"""
+Exercise 1.16
 
+"""
+    
+def powiter(b,n,a):
+    if (n == 1):
+        return b*a
+    if (n%2 == 0):
+        return powiter(b*b,n/2,a)
+    return powiter(b*b,(n-1)/2,a*b)
+
+def power(b,n):
+    return powiter(b,n,1)
+
+# print(power(-5,4))
 
 
 
