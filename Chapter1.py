@@ -76,7 +76,7 @@ def cbiter (guess, x, lastguess, acceptederror): # cube root is defined for nega
 def cbrter (x):
     return cbiter(1,x,2*x, 0.01)
 #print(cbrter(27))
-print(cbrter(-1))
+#print(cbrter(-1))
 
 """
 Exercise 1.9
@@ -201,12 +201,76 @@ def power(b,n):
 
 # print(power(-5,4))
 
+"""
+Exercise 1.17
+"""
+
+def halve(n):
+    return n/2
+def double(n):
+    return 2*n
+def iseven(n):
+    return (n%2 == 0)
+def negate(n):
+    return 0-n
+
+def fasttimes(a,b):
+    if (a < 0):
+        return negate(fasttimes(negate(a),b))
+    if (b < 0):
+        return negate(fasttimes(a,negate(b)))
+    if (b == 0):
+        return 0
+    if (b == 1):
+        return a
+    if (iseven(b)):
+        return double(fasttimes(a,halve(b)))
+    else:
+        return b + double(fasttimes(a,halve(b-1)))
+    
+
+"""
+Exercise 1.18
+"""
+
+def betterpowiter(b,n,a):
+    if (n == 1):
+        return fasttimes(b,a)
+    if (n%2 == 0):
+        return powiter(fasttimes(b,b),halve(n),a)
+    return powiter(fasttimes(b,b),halve(n-1),fasttimes(a,b))
+
+def betterpower(b,n):
+    return powiter(b,n,1)
+
+"""
+Exercise 1.19
+
+a ← bq + aq + ap and b ← bp + aq twice is equal to
+a is now (bp+aq)q+(bq+aq+ap)(p+q) = b (q^2+2pq) + a(2q^2+p^2+2pq)
+b is now p(bp+aq) + q(bq+aq+ap) = b(p^2+q^2) + a(q^2+2pq)
+
+t(t(a,b)) using p,q is the same as t(a,b) using p^2+q^2, q^2+2pq
+
+"""
+def transform(p,q):
+    return lambda pair : (pair[1]*q+pair[0]*p+pair[0]*q, pair[1]*p+pair[0]*q)
 
 
+def genfibiter(a,b,p,q,count):
+    if (count == 0):
+        return b
+    if (iseven(count)):
+        return genfibiter(a,b,p**2+q**2,q**2+2*p*q,count/2)
+    else:
+        return genfibiter(b*q+a*p+a*q, b*p+a*q, p, q, count-1)
 
+def genfib (n, p, q):
+    return genfibiter(1,0,p,q,n)
+    
 
-
-
+for i in range(10):
+    print(genfib(i,0,1))
 
 
 
