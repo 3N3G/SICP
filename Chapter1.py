@@ -261,17 +261,86 @@ def genfibiter(a,b,p,q,count):
     if (count == 0):
         return b
     if (iseven(count)):
-        return genfibiter(a,b,p**2+q**2,q**2+2*p*q,count/2)
+        return genfibiter(a,b,p**2+q**2,q**2+2*p*q,halve(count))
     else:
-        return genfibiter(b*q+a*p+a*q, b*p+a*q, p, q, count-1)
+        return genfibiter(transform(p,q)((a,b))[0], transform(p,q)((a,b))[1], p, q, count-1)
 
 def genfib (n, p, q):
     return genfibiter(1,0,p,q,n)
     
-
-for i in range(10):
+"""
+Test:
+    for i in range(10):
     print(genfib(i,0,1))
+"""
 
+"""
+Exercise 1.20
+substitution method (normal order):
+    gcd(206,40)
+    = gcd(40, remainder(206,40))
+    = gcd(40, 6)
+    = gcd(6, remainder(40,6))
+    = gcd(6, 4)
+    = gcd(4, remainder(6,4))
+    = gcd(4, 2)
+    = gcd(2, remainder(4,2))
+    = gcd(2, 0)
+    = 2
+    
+4 evaluations of remainder function
 
+applicative-order:
+    gcd(206,40)
+    = gcd(40, remainder(206,40))
+    = gcd(remainder(206,40), remainder(remainder(206,40),40))
+    = ...
+    
+May never end
+"""
 
+"""
+Exercise 1.21
+"""
+
+def finddivisor(n, testdivisor):
+    if (testdivisor**2 > n):
+        return n
+    elif (n % testdivisor == 0):
+        return testdivisor
+    return finddivisor(n, testdivisor+1)
+
+def smallestdivisor(n):
+    return finddivisor(n,2)
+# nb I actually forgot to put return before finddivisor in this function so the code wasn't working and I asked chatgpt and it caught my silly mistake
+# print(smallestdivisor(199))
+# print(smallestdivisor(1999))
+# print(smallestdivisor(19999))
+
+"""
+Exercise 1.22
+"""
+import time
+
+def isprime(n):
+    return smallestdivisor(n) == n
+
+def timed_prime_test(n):
+    numprimesgreaterthann = 0
+    guess = n
+    while (numprimesgreaterthann < 3):
+        if isprime(guess):
+            print(guess)
+            numprimesgreaterthann = numprimesgreaterthann + 1
+            guess = guess + 1
+    time.sleep(1)  # simulate some processing time
+
+start_time = time.time()
+
+timed_prime_test(1000)
+end_time = time.time()
+
+runtime = end_time - start_time
+print("Runtime: ", runtime, "seconds")
+# WIP
 
