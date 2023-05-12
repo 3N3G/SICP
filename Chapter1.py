@@ -332,15 +332,69 @@ def timed_prime_test(n):
         if isprime(guess):
             print(guess)
             numprimesgreaterthann = numprimesgreaterthann + 1
-            guess = guess + 1
-    time.sleep(1)  # simulate some processing time
+        guess = guess + 1
+
+def time_prime_test(n):
+    start_time = time.time()
+    timed_prime_test(n)
+    end_time = time.time()
+    runtime = end_time - start_time
+    print("Runtime: ", runtime * 1000, "milliseconds")
+
+"""
+time_prime_test(100)
+time_prime_test(1000)
+time_prime_test(10000)
+time_prime_test(100000)
+"""
+
+# seems that the time is roughly increasing by a factor of rt1. let's check how linear it is
+# with chatgpt's help:
+import numpy as np
+from scipy.stats import pearsonr
+# Input data
+x = np.array([1, 2, 3, 4])
+y = np.log10(np.array([0.05507469177246094, 0.1659393310546875, 0.7359981536865234, 2.375364303588867]))
+corr, _ = pearsonr(x, y)
+# print("Pearson correlation coefficient: {:.3f}".format(corr))
+
+"""
+Exercise 1.23
+"""
+
+def next(n):
+    if (n == 2):
+        return 3
+    else:
+        return n + 2
+    
+def finddivisor2(n, testdivisor):
+    if (testdivisor**2 > n):
+        return n
+    elif (n % testdivisor == 0):
+        return testdivisor
+    return finddivisor(n, next(testdivisor))
+
+def smallestdivisor2(n):
+    return finddivisor(n,2)
+
+def isprimenew(n):
+    return smallestdivisor2 == n
+
 
 start_time = time.time()
-
-timed_prime_test(1000)
+isprimenew(100003)
 end_time = time.time()
-
 runtime = end_time - start_time
-print("Runtime: ", runtime, "seconds")
-# WIP
+print("New Runtime: ", runtime * 1000, "milliseconds")
+
+start_time = time.time()
+isprime(100003)
+end_time = time.time()
+runtime = end_time - start_time
+print("Old Runtime: ", runtime * 1000, "milliseconds")
+
+
+
+
 
