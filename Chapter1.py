@@ -142,8 +142,18 @@ def iterativef(n):
 """
 Actual iterative program:
 """
-
-
+def f(n):
+    if (n < 3):
+        return n
+    oneprev = 2
+    twoprev = 1
+    threeprev = 0
+    for i in range(n-2):
+        oneprevnew = oneprev + 2 * twoprev + 3 * threeprev
+        threeprev = twoprev
+        twoprev = oneprev
+        oneprev = oneprevnew
+    return oneprev
 
 """
 Exercise 1.12
@@ -199,7 +209,21 @@ def powiter(b,n,a):
 def power(b,n):
     return powiter(b,n,1)
 
-# print(power(-5,4))
+def iterpower(b,n):
+    expleft = n
+    val = b
+    while (expleft > 0):
+        if (expleft % 2 == 0):
+           val = val * val
+           expleft = expleft / 2
+        elif (expleft > 1):
+            val = val * b
+            expleft = expleft - 1
+        else:
+            break
+    return val
+            
+print(power(-5,4), iterpower(-5,4))
 
 """
 Exercise 1.17
