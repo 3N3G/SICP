@@ -52,7 +52,7 @@ def sqriter (guess, x, lastguess, acceptederror):
     if (goodenough(guess, x, lastguess, acceptederror)):
         return guess
     else:
-        return sqriter(0.5*(guess+x/guess), x, guess)
+        return sqriter(0.5*(guess+x/guess), x, guess, acceptederror)
         
 def sqrter (x):
     if (x<0):
@@ -223,7 +223,7 @@ def iterpower(b,n):
             break
     return val
             
-print(power(-5,4), iterpower(-5,4))
+# print(power(-5,4), iterpower(-5,4))
 
 """
 Exercise 1.17
@@ -354,7 +354,7 @@ def timed_prime_test(n):
     guess = n
     while (numprimesgreaterthann < 3):
         if isprime(guess):
-            print(guess)
+            # print(guess)
             numprimesgreaterthann = numprimesgreaterthann + 1
         guess = guess + 1
 
@@ -405,18 +405,129 @@ def smallestdivisor2(n):
 def isprimenew(n):
     return smallestdivisor2 == n
 
+def testtime(f, args):
+    start_time = time.time()
+    f(args)
+    end_time = time.time()
+    print("Runtime: ", 1000*(end_time - start_time), " milliseconds")
 
-start_time = time.time()
-isprimenew(100003)
-end_time = time.time()
-runtime = end_time - start_time
-print("New Runtime: ", runtime * 1000, "milliseconds")
+"""
+testtime(isprimenew, 100003)
+testtime(isprime, 100003)
+"""
 
-start_time = time.time()
-isprime(100003)
-end_time = time.time()
-runtime = end_time - start_time
-print("Old Runtime: ", runtime * 1000, "milliseconds")
+"""
+Exercise 1.24
+"""
+import random
+def expmod (base, exp, mod):
+    if (exp == 0):
+        return 1
+    elif (exp % 2 == 0):
+        return (expmod(base, exp/2, mod)**2) % mod
+    else:
+        return (base*expmod(base, exp - 1, mod)) % mod
+
+def fermattest (n):
+    def tryn (a):
+        return (expmod(a,n,n) == a)
+    tryn(random.randint(1,n-1))
+
+def fastprime (n, times):
+    if (times == 0):
+        return True
+    if (fermattest(n)):
+        fastprime(n, times - 1)
+    else:
+        return False
+
+def testprimefast(n):
+    return fastprime(n, int(n**(0.25)))
+
+"""
+testtime(testprimefast, 1000003)
+testtime(testprimefast, 100003)
+testtime(testprimefast, 10003)
+testtime(testprimefast, 1003)
+Roughly linear decrease which makes sense since exponential decrease in n -> linear decrease in log(n)
+"""
+
+"""
+Exercise 1.25
+
+The reason why we write expmod as its own method is to reduce the size of the numbers being computed. Expmod ensures that all multiplications result in at most a number of size n*n, whereas quickly using expfast will be unreasonable as n increases, and the computer has to compute arbitrarily large a^n
+"""
+
+
+"""
+Exercise 1.26
+
+The reason why this code is so much slower is because Louis is writing the product of two things. Although his intent is to square the value and they are the same, the compiler will calculate each independently, doubling the amount of work. However, it does this at each step of the recursion, increasing its work by a power of two. Thus the speed would be O(2^log(n)) ~ O(n)
+"""
+
+"""
+Exercise 1.27
+"""
+
+def completefermattest (n):
+    for i in range(n-1):
+        if (expmod(i+1, n, n) != i+1):
+            return False
+    return True
+
+"""
+print(completefermattest(7)) # is a prime, test says yes
+print(completefermattest(561)) # isn't a prime, test says yes
+print(completefermattest(55)) # isn't a prime, test says no
+"""
+
+"""
+Exercise 1.28
+"""
+def mrexpmod(base, exp, mod):
+    if (exp == 0):
+        return 1
+    elif (exp % 2 == 0):
+        beforesquare = (expmod(base, exp/2, mod))
+        if (beforesquare != 1 and beforesquare != mod - 1):
+            if (beforesquare ** 2 % mod == 1):
+                return 0
+        return beforesquare ** 2 % mod
+    else:
+        return (base*expmod(base, exp - 1, mod)) % mod
+
+
+def mrtest (n):
+    def tryn (a):
+        return (mrexpmod(a,n,n) == a)
+    tryn(random.randint(1,n-1))
+
+def mrfastprime (n, times):
+    if (times == 0):
+        return True
+    if (mrtest(n)):
+        mrfastprime(n, times - 1)
+    else:
+        return False
+
+def mrtestprimefast(n):
+    return fastprime(n, int(n**(0.25)))
+
+# print (mrtestprimefast(561))
+
+
+"""
+Exercise 1.29
+"""
+
+
+
+
+
+
+
+
+
 
 
 
