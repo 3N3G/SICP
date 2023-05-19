@@ -520,16 +520,176 @@ def mrtestprimefast(n):
 Exercise 1.29
 """
 
+# Question: why is "sum" here orange but "integral_simpsons" is blue?
+
+def sum (term, a, nex, b):
+    if (a>b):
+        return 0
+    else:
+        return term(a)+sum(term, nex(a), nex, b)
+
+def integral_simpsons(f,a,b,n):
+    h = (b-a)/n        
+    def thingtoadd(i):
+        if i == 0:
+            return f(a)
+        elif i == n:
+            return f(b)
+        elif i % 2 == 0:
+            return 2*f(a+i*h)
+        else:
+            return 4*f(a+i*h)
+    return sum(thingtoadd, 0, lambda x: x+1, n) * h / 3
 
 
+# print(integral_simpsons(lambda x: x**3, 0, 1, 100))
+# print(integral_simpsons(lambda x: x**3, 0, 1, 1000))
+
+"""
+Exercise 1.30
+"""
+
+def itersum(term, a, nex, b):
+    def iters(a, result):
+        if (a > b):
+            return 0
+        else:
+            iters(nex(a), result + term(a))
+    iters(a, 0)
+
+def iter_integral_simpsons(f,a,b,n):
+    h = (b-a)/n        
+    def thingtoadd(i):
+        if i == 0:
+            return f(a)
+        elif i == n:
+            return f(b)
+        elif i % 2 == 0:
+            return 2*f(a+i*h)
+        else:
+            return 4*f(a+i*h)
+    return itersum(thingtoadd, 0, lambda x: x+1, n) * h / 3
+
+# print(integral_simpsons(lambda x: x**3, 0, 1, 100))
+# print(integral_simpsons(lambda x: x**3, 0, 1, 1000))
+
+"""
+Exercise 1.31
+"""
+def recursiveprod (term, a, nex, b):
+    if (a>b):
+        return 1
+    else:
+        return term(a)*recursiveprod(term, nex(a), nex, b)
+
+def approxpi(n):
+    return 4 * recursiveprod(lambda x: (x-1)/x*(x+1)/x, 3, lambda x: x+2, n+2)
+"""
+print(approxpi(10))
+print(approxpi(100))
+print(approxpi(1000))
+"""
+
+def iterprod (term, a, nex, b):
+    marker = a
+    prod = 1
+    while (marker <= b):
+        prod = prod * term(marker)
+        marker = nex(marker)
+    return prod
+
+def iterapproxpi(n):
+    return 4 * iterprod(lambda x: (x-1)/x*(x+1)/x, 3, lambda x: x+2, n+2)
+
+"""
+print(iterapproxpi(10))
+print(iterapproxpi(100))
+print(iterapproxpi(1000))
+"""
+
+"""
+Exercise 1.32
+"""
+
+def recaccumulate (combiningfunction, identity, term, a, nex, b): # for prod the identity is 1, for sum it is 0
+    if (a>b):
+        return identity
+    else:
+        return combiningfunction(term(a), recaccumulate(combiningfunction, identity, term, nex(a), nex, b))
+
+def iteraccumulate (combiningfunction, identity, term, a, nex, b): # for prod the identity is 1, for sum it is 0
+    marker = a
+    prod = identity
+    while (marker <= b):
+        prod = combiningfunction(prod, term(marker))
+        marker = nex(marker)
+    return prod
+
+"""
+Exercise 1.33
+"""
+
+def filtered_accumulate (combiningfunction, identity, term, a, nex, b, filter):
+    marker = a
+    prod = identity
+    while (marker <= b):
+        if filter(marker):
+            prod = combiningfunction(prod, term(marker))
+        marker = nex(marker)
+    return prod
+
+def add(a,b):
+    return a+b
+
+def prod(a,b):
+    return a*b
+
+def sumsquaresofprimesinrange(a,b):
+    return filtered_accumulate(add, 0, lambda x: x**2, a, lambda x: x+1, b, isprime)
+
+# print(sumsquaresofprimesinrange(1,10))
+
+import math
+
+def prodrelprimes(n):
+    def isrelprime(a):
+        return math.gcd(a,n) == 1
+    return filtered_accumulate(prod, 1, lambda x: x, 1, lambda x: x+1, n, isrelprime)
+
+# print(prodrelprimes(16))
+# print(filtered_accumulate(prod, 1, lambda x: x, 1, lambda x: x+1, 16, lambda x: x%2==1))
+
+"""
+Exercise 1.34
+
+Nothing will happen, since the compiler will try to calculate (f 2) which is (2 2) which doesn't make sense
+"""
 
 
+"""
+Exercise 1.35
+x = 1+1/x means x^2-x-1=0 which we know golden ratio is a root of
+"""
 
+tolerance = 0.0001
 
+def closeenough(a,b):
+    return abs(a-b) < tolerance
 
+def fixedpoint(f, firstguess):
+    def tryit(guess):
+        fofit = f(guess)
+        if closeenough(guess, fofit):
+            return fofit
+        else:
+            return tryit(fofit)
+    
+    return tryit(firstguess)
 
+# print(fixedpoint(lambda x: 1+1/x, 1))
 
-
-
+"""
+Exercise 1.36
+"""
 
 
