@@ -520,15 +520,15 @@ def mrtestprimefast(n):
 Exercise 1.29
 """
 
-# Question: why is "sum" here orange but "integral_simpsons" is blue?
-
-def sum (term, a, nex, b):
+def summing (term, a, nex, b):
     if (a>b):
         return 0
     else:
-        return term(a)+sum(term, nex(a), nex, b)
+        return term(a)+summing(term, nex(a), nex, b)
 
 def integral_simpsons(f,a,b,n):
+    if (n <= 0):
+        return 0
     h = (b-a)/n        
     def thingtoadd(i):
         if i == 0:
@@ -539,7 +539,7 @@ def integral_simpsons(f,a,b,n):
             return 2*f(a+i*h)
         else:
             return 4*f(a+i*h)
-    return sum(thingtoadd, 0, lambda x: x+1, n) * h / 3
+    return summing(thingtoadd, 0, lambda x: x+1, n) * h / 3
 
 
 # print(integral_simpsons(lambda x: x**3, 0, 1, 100))
@@ -553,9 +553,12 @@ def itersum(term, a, nex, b):
     def iters(a, result):
         if (a > b):
             return 0
+        if (a == b):
+            return result
         else:
-            iters(nex(a), result + term(a))
-    iters(a, 0)
+            # print("Calling iters on ", nex(a), result + term(a))
+            return iters(nex(a), result + term(a))
+    return iters(a, 0)
 
 def iter_integral_simpsons(f,a,b,n):
     h = (b-a)/n        
@@ -570,8 +573,8 @@ def iter_integral_simpsons(f,a,b,n):
             return 4*f(a+i*h)
     return itersum(thingtoadd, 0, lambda x: x+1, n) * h / 3
 
-# print(integral_simpsons(lambda x: x**3, 0, 1, 100))
-# print(integral_simpsons(lambda x: x**3, 0, 1, 1000))
+# print(iter_integral_simpsons(lambda x: x**3, 0, 1, 100))
+# print(iter_integral_simpsons(lambda x: x**3, 0, 1, 1000))
 
 """
 Exercise 1.31
@@ -583,7 +586,10 @@ def recursiveprod (term, a, nex, b):
         return term(a)*recursiveprod(term, nex(a), nex, b)
 
 def approxpi(n):
-    return 4 * recursiveprod(lambda x: (x-1)/x*(x+1)/x, 3, lambda x: x+2, n+2)
+    finalmultiply = 4 # formula would otherwise return pi/4
+    firstdenom = 3 # starts with 3
+    jumpby = 2 # the denominators are every odd number
+    return finalmultiply * recursiveprod(lambda x: (x-1)/x*(x+1)/x, firstdenom, lambda x: x+jumpby, n+jumpby)
 """
 print(approxpi(10))
 print(approxpi(100))
@@ -599,7 +605,10 @@ def iterprod (term, a, nex, b):
     return prod
 
 def iterapproxpi(n):
-    return 4 * iterprod(lambda x: (x-1)/x*(x+1)/x, 3, lambda x: x+2, n+2)
+    finalmultiply = 4 # formula would otherwise return pi/4
+    firstdenom = 3 # starts with 3
+    jumpby = 2 # the denominators are every odd number
+    return finalmultiply * iterprod(lambda x: (x-1)/x*(x+1)/x, firstdenom, lambda x: x+jumpby, n+jumpby)
 
 """
 print(iterapproxpi(10))
@@ -692,4 +701,18 @@ def fixedpoint(f, firstguess):
 Exercise 1.36
 """
 
+print(fixedpoint(lambda x: math.log10(1000)/math.log10(x), 4))
 
+
+"""
+Exercise 1.37
+"""
+
+
+
+
+
+
+
+
+  
