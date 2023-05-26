@@ -701,18 +701,207 @@ def fixedpoint(f, firstguess):
 Exercise 1.36
 """
 
-print(fixedpoint(lambda x: math.log10(1000)/math.log10(x), 4))
+# print(fixedpoint(lambda x: math.log10(1000)/math.log10(x), 4))
 
 
 """
 Exercise 1.37
 """
 
+def rec_cont_frac(n,d,k):
+    def recur(i):
+        if (k == i):
+            return n(i)/d(i)
+        else:
+            return n(i)/(d(i)+recur(i+1))
+        
+    return recur(1)
+
+def estimate_inverse_phi(k):
+    return rec_cont_frac(lambda x: 1, lambda x: 1, k)
+
+# print(2/(1+5**.5))
+# print(estimate_inverse_phi(11))
+
+def iter_cont_frac(n,d,k):
+    val = 0
+    for i in range(k):
+        val = n(k-i)/(d(k-i)+val)
+    return val
+
+def iter_estimate_inverse_phi(k):
+    return iter_cont_frac(lambda x: 1, lambda x: 1, k)
+
+# print(iter_estimate_inverse_phi(11))
+
+"""
+Exercise 1.38
+"""
+
+def d(i):
+    if (i % 3 == 2):
+        return (i+1)/3*2
+    else:
+        return 1
+    
+def approximate_e(k):
+    return 2+iter_cont_frac(lambda x: 1, d, k)
+
+# print(approximate_e(10))
+
+"""
+Exercise 1.39
+"""
+
+def lambert_tangent(x, k): # gives tan(x) where x is in radians. does k deep operation
+    def n(i):
+        if (i == 1):
+            return x
+        else:
+            return -x*x
+    return iter_cont_frac(n , lambda x: 2*x-1, k)
+
+# print(lambert_tangent(math.pi/4,10))
+
+"""
+Exercise 1.40
+"""
+
+def deriv(g):
+    dx = 0.0001
+    return lambda x: (g(x+dx)-g(x))/dx
+
+def newton_transform(g):
+    return lambda x: x - (g(x)/deriv(g)(x))
+
+def newton_method(g, guess):
+    return fixedpoint(newton_transform(g), guess)
+
+def cubic(a,b,c):
+    return lambda x: x**3 + a*x**2 + b*x + c
+
+def solve_cubic(a,b,c):
+    return newton_method(cubic(a,b,c),1)
+
+# print(solve_cubic(2,-12,7))
+# print(cubic(2,-12,7)(solve_cubic(2,-12,7)))
+
+
+"""
+Exercise 1.41
+"""
+
+def doubledo(f):
+    return lambda x: f(f(x))
+
+def inc(x):
+    return x+1
+
+# print(doubledo(doubledo(doubledo))(inc)(5))
+
+
+"""
+Exercise 1.42
+"""
+
+def compose(f,g):
+    return lambda x: f(g(x))
+
+def square(x):
+    return x**2
+
+# print(compose(square, inc)(6))
+
+
+"""
+Exercise 1.43
+"""
+
+def repeated(f, n):
+    if (n < 0):
+        return 0
+    if (n == 0):
+        return lambda x: x
+    else:
+        return lambda x: f(repeated(f,n-1)(x))
+
+# print(repeated(square, 2)(5))
+
+
+"""
+Exercise 1.44
+"""
+
+def smooth(f):
+    dx = 0.001
+    return lambda x: (f(x-dx)+f(x)+f(x+dx))/3
+
+def nth_smooth(f,n):
+    return repeated(smooth, n)(f)
+
+"""
+Exercise 1.45
+"""
+
+def average_damp(f):
+    return lambda x: (f(x)+x)/2
+
+def nth_root(x, n, damptimes):
+    def repeated_damp():
+        return repeated(average_damp, damptimes)
+    return fixedpoint(repeated_damp()(lambda y: x/(y**(n-1))), 1)
+    
+
+# print(nth_root(64, 4, 1)) 4 is the first one for which 1 doesn't work
+# print(nth_root(64, 8, 2)) 8 is the first one for which 2 doesn't work
+# use floor(log2(n))
+
+def nth_root_consistent(x,n):
+    return nth_root(x, n, math.floor(math.log2(n)))
+
+# print(nth_root_consistent(256,8))
+
+"""
+Exercise 1.46
+"""
+
+def iter_improve(good_enough, improve):
+    def functiontoreturn(guess):
+        done = False
+        while (not done):
+            guess = improve(guess)
+            if good_enough(guess):
+                done = True
+        return guess
+    return functiontoreturn
+
+def iter_improved_sqrt(x):
+    tolerance = 0.01
+    def improve(guess):
+        return (guess+x/guess)/2
+    
+    def good_enough(guess):
+        return abs(square(guess) - x) < tolerance
+    return iter_improve(good_enough, improve)(1)
+
+# print(iter_improved_sqrt(10))
+
+
+
+def iter_improved_fixed_point(f, firstguess):
+    tolerance = 0.01
+    def improve(guess):
+        return f(guess)
+
+    def good_enough(guess, f):
+        return abs(guess - f(guess)) < tolerance
+
+    return iter_improve(lambda x: good_enough(x, f), improve)
+
+print(iter_improved_fixed_point(lambda x: 4*x-1,1))
+# currently this fixed point thing doesn't work and i need to figure out why. wip
 
 
 
 
 
-
-
-  
