@@ -893,15 +893,11 @@ def iter_improved_fixed_point(f, firstguess):
     def improve(guess):
         return f(guess)
 
-    def good_enough(guess, f):
+    def good_enough(guess):
         return abs(guess - f(guess)) < tolerance
 
-    return iter_improve(lambda x: good_enough(x, f), improve)
+    return iter_improve(good_enough, improve)(firstguess)
 
-print(iter_improved_fixed_point(lambda x: 4*x-1,1))
-# currently this fixed point thing doesn't work and i need to figure out why. wip
-
-
-
-
+print(iter_improved_fixed_point(lambda x: math.cos(x),1))
+print(iter_improved_fixed_point(lambda x: 4*x-1,0.3333))
 
