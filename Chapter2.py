@@ -62,7 +62,7 @@ def printRat(x):
 third = make_rat(1,3)
 nhalf = make_rat(1,-2)
 
-printRat(mulRat(third,nhalf))
+# printRat(mulRat(third,nhalf))
 
 
 """
@@ -134,7 +134,7 @@ r2 = make_point(8,6)
 r3 = make_point(5,10)
 r4 = make_point(-3,4)
 rect = make_rect(r1,r2,r3,r4)
-print(area(rect))
+# print(area(rect))
 
 def make_rect2(p1,p2,l): # so that the rectangle has p1 then p2 in clockwise order
     return (p1,p2,l)
@@ -163,7 +163,7 @@ def car(z):
 def cdr(z):
     return z(lambda x,y: y)
 
-print(car(cons(1,2)))
+# print(car(cons(1,2)))
 
 """
 Exercise 2.5
@@ -233,8 +233,8 @@ Because division uses multiplication it must not be true for division either
 """
 Exercise 2.10
 """
-def div_interval: #assume alyssas program
-    return
+def div_interval(): #assume alyssas program
+    return #alyssas program
 
 def divide_interval(x,y):
     if (lower_bound(x)*upper_bound(x)<=0 or lower_bound(y)*upper_bound(y)>=0):
@@ -242,9 +242,68 @@ def divide_interval(x,y):
     return div_interval(x,y)
 
 """
-Exercise 2.11
+Exercise 2.17
+"""
+def last_pair(l):
+    if (isinstance(l, int)):
+        return l
+    else:
+        return last_pair(l[1])
+
+
+seq = (1,(2,(3,4)))
+# print(last_pair(seq))
+
+
+"""
+Exercise 2.18
+"""
+def reverse(l):
+    if isinstance(l[1], int):
+        return (l[1],l[0])
+    return (reverse(l[1]),l[0])
+    
+# print(reverse(seq))
+
+
+"""
+Exercise 2.20
+
+Lisp specific
 """
 
+"""
+Exercise 2.21
+"""
+def maplist(procedure, thelist):
+    if len(thelist)==0:
+        return []
+    return [procedure(thelist[0])] + (maplist(procedure, thelist[1:]))
+
+# print(maplist(lambda x: x**2, [-1,0,1,2,3]))
+
+"""
+Exercise 2.22
+
+He's iterating through the list in the wrong order in the first one. it takes things fron the end (cdr) and puts them at the front of answer (car)
+
+the second approach cons a list and an element together, so it would be like {{1,2},{3}}
+"""
+
+
+"""
+Exercise 2.23
+
+define (foreach function list) (if (null? list) True (function(car(list)) foreach function cdr(list)))
+"""
+
+def for_each(function, listA):
+    for i in listA:
+        function(i)
+
+"""
+Exercise 2.24
+"""
 
 
 
