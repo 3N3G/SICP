@@ -303,10 +303,60 @@ def for_each(function, listA):
 
 """
 Exercise 2.24
+
+{1,{2,{3,4}}}
+(list 1 (list 2 (list 3 4)))
+(1(2(3 4))
+| \
+1 (2(3 4)
+    /  \
+   2   (3 4)
+        /  \
+        3  4
+        
+"""
+"""
+Exercise 2.25
+x1 = (1 3 (5 7) 9)
+x2 = ((7))
+x3 = (1 (2 (3 (4 (5 (6 7))))))
+
+cdr(car(cdr(cdr(x1)))) = 7
+car(car(x2)) = 7
+cdr(cdr(cdr(cdr(cdr(cdr(x3))))))=7
 """
 
+"""
+Exercise 2.26
+
+1)
+    (1 2 3 4 5 6)
+2)
+    ((1 2 3) 4 5 6)
+3)
+    (1 2 3) (4 5 6)
+"""
+
+"""
+Exercise 2.27
+"""
+def deep_reverse(l):
+    l2 = []
+    if isinstance(l, int):
+            return l
+        
+    for i in range(len(l)):
+        l2.append(deep_reverse(l[len(l)-1-i]))
+
+    return l2
 
 
+testl = [1,2,[3,4]]
+# print(deep_reverse(testl))
+
+"""
+Exercise 2.28
+"""
 
 
 
