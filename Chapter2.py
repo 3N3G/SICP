@@ -6,6 +6,8 @@ Created on Sat May 27 11:47:12 2023
 @author: gene
 """
 
+car(list) = list[0]
+cdr(list) = list[1:]
 """
 Exercise 2.1
 """
@@ -193,8 +195,8 @@ def add_one(n):
     return lambda f: lambda x: f(n(f)(x))
 
 #one = add_one(zero) = lambda f: lambda x: f(f(x))
-one = lambda f: lambda x: f(f(x))
-two = lambda f: lambda x: f(f(f(x)))
+# one = lambda f: lambda x: f(f(x))
+# two = lambda f: lambda x: f(f(f(x)))
 
 def add(m,n):
     return lambda f: lambda x: m(f)(n(f)(x))
@@ -251,7 +253,7 @@ def last_pair(l):
         return last_pair(l[1])
 
 
-seq = (1,(2,(3,4)))
+# seq = (1,(2,(3,4)))
 # print(last_pair(seq))
 
 
@@ -278,7 +280,7 @@ Exercise 2.21
 def maplist(procedure, thelist):
     if len(thelist)==0:
         return []
-    return [procedure(thelist[0])] + (maplist(procedure, thelist[1:]))
+    return [procedure(car(thelist))] + (maplist(procedure, cdr(thelist)))
 
 # print(maplist(lambda x: x**2, [-1,0,1,2,3]))
 
@@ -351,17 +353,135 @@ def deep_reverse(l):
     return l2
 
 
-testl = [1,2,[3,4]]
+# testl = [1,2,[3,4]]
 # print(deep_reverse(testl))
 
 """
 Exercise 2.28
 """
 
+def fringe(l):
+    if (not l):
+        return []
+    if isinstance(l, int):
+        return [l]
+    first = car(l)
+    rest = cdr(l)
+    return fringe(first) + fringe(rest)
+
+# testlist = [1,2,[3,4]]
+# print(fringe(testlist))
+
+"""
+Exercise 2.29
+"""
+
+def make_mobile(left,right):
+    return (left,right)
+
+def left_branch(mobile):
+    return mobile[0]
+
+def right_branch(mobile):
+    return mobile[1]
+
+def make_branch(length, structure):
+    return (length, structure)
+
+def branch_length(branch):
+    return branch[0]
+
+def branch_structure(branch):
+    return branch[1]
+
+def total_weight(mobile):
+    if isinstance(mobile, int):
+        return mobile
+    if (not mobile):
+        return 0
+    return total_weight(branch_structure(left_branch(mobile))) + total_weight(branch_structure(right_branch(mobile)))
+
+"""
+b1 = make_branch(1,2)
+b2 = make_branch(2,3)
+b3 = make_branch(3,make_mobile(b2,b2))
+m1 = make_mobile(b1,b3)
+print(total_weight(m1))
+"""
+
+def naivelyBalanced(mobile):
+    return branch_length(right_branch(mobile))*total_weight(branch_structure(right_branch(mobile))) == branch_length(left_branch(mobile))*total_weight(branch_structure(left_branch(mobile)))
+
+def isBalanced(mobile):
+    if isinstance(mobile, int):
+        return True
+    if (not mobile):
+        return True
+    return isBalanced(branch_structure(left_branch(mobile))) and isBalanced(branch_structure(right_branch(mobile))) and branch_length(right_branch(mobile))*total_weight(branch_structure(right_branch(mobile))) == branch_length(left_branch(mobile))*total_weight(branch_structure(left_branch(mobile)))
+
+# mobiletest = make_mobile(make_branch(4,6),make_branch(2,make_mobile(make_branch(5,8),make_branch(10,4))))
+# print(isBalanced(mobiletest))
+
+"""
+d)
+Not much work at all. As long as the left_branch, right_branch, branch_length and branch_structure are changed, the other methods will still work.
+"""
+
+"""
+Exercise 2.30, 2.31
+"""
+def mapTree(tree, map):
+    if not tree:
+        return []
+    if isinstance(tree, int):
+        return map(tree)
+    return [mapTree(tree[0],map)] + [mapTree(tree[1],map)]
+
+def squareTree(tree):
+    return mapTree(tree, lambda x: x**2)
+
+"""
+Exercise 2.32
+"""
+def powerset(S):
+    if not S:
+        return [[]]
+    rest = powerset(cdr(S))
+    return rest + maplist(lambda x: [car(S)]+x, rest)
+# Two copies of the powerset of S without first element: one with it and one without it
+    
+"""
+Exercise 2.33
+"""
+def accumulate(operation, initial, sequence):
+    if not sequence:
+        return initial
+    else:
+        return operation(car(sequence), accumulate(operation, initial, cdr(sequence)))
+
+def map(p, sequence):
+    accumulate(lambda x: p(x[0])+p(x[1]), [], sequence)
+def append(seq1, seq2):
+    accumulate(lambda x: x[0]+x[1], seq1, seq2)
+def length(sequence):
+    accumulate(lambda x: x+1, 0, sequence)
 
 
+"""
+Exercise 2.34
+"""
+def hornerEval(x, coefficientSequence):
+    return accumulate(lambda thisCoeff, higherTerms: thisCoeff + x*higherTerms, 0, coefficientSequence)
 
-
+"""
+Exercise 2.35
+"""
+def countLeaves(tree):
+    if not tree:
+        return 0
+    if isinstance(tree, int):
+        return 1
+    return countLeaves(tree[0]) + countLeaves(tree[1])
 
 
 
