@@ -6,8 +6,6 @@ Created on Sat May 27 11:47:12 2023
 @author: gene
 """
 
-car(list) = list[0]
-cdr(list) = list[1:]
 """
 Exercise 2.1
 """
@@ -280,7 +278,7 @@ Exercise 2.21
 def maplist(procedure, thelist):
     if len(thelist)==0:
         return []
-    return [procedure(car(thelist))] + (maplist(procedure, cdr(thelist)))
+    return [procedure(thelist[0])] + (maplist(procedure, thelist[1:]))
 
 # print(maplist(lambda x: x**2, [-1,0,1,2,3]))
 
@@ -365,8 +363,8 @@ def fringe(l):
         return []
     if isinstance(l, int):
         return [l]
-    first = car(l)
-    rest = cdr(l)
+    first = l[0]
+    rest = l[1:]
     return fringe(first) + fringe(rest)
 
 # testlist = [1,2,[3,4]]
@@ -446,26 +444,39 @@ Exercise 2.32
 def powerset(S):
     if not S:
         return [[]]
-    rest = powerset(cdr(S))
-    return rest + maplist(lambda x: [car(S)]+x, rest)
+    rest = powerset(S[1:])
+    return rest + maplist(lambda x: [S[0]]+x, rest)
 # Two copies of the powerset of S without first element: one with it and one without it
-    
+
 """
 Exercise 2.33
 """
 def accumulate(operation, initial, sequence):
     if not sequence:
         return initial
-    else:
-        return operation(car(sequence), accumulate(operation, initial, cdr(sequence)))
+    return operation(sequence[0], accumulate(operation, initial, sequence[1:]))
 
 def map(p, sequence):
-    accumulate(lambda x: p(x[0])+p(x[1]), [], sequence)
+    def op(x,y):
+        return [p(x)]+y
+    return accumulate(op, [], sequence)
 def append(seq1, seq2):
-    accumulate(lambda x: x[0]+x[1], seq1, seq2)
+    def op(x,y):
+        return x+y
+    return accumulate(op, seq1, seq2)
 def length(sequence):
-    accumulate(lambda x: x+1, 0, sequence)
+    def op(x,y):
+        return y+1
+    return accumulate(op, 0, sequence)
+testlength = [1,2,3,[4,5]]
+# print(length(testlength))
 
+
+def testp(x):
+    return 2*x
+testseq = [1,2,3,4]
+
+# print(map(testp, testseq))
 
 """
 Exercise 2.34
@@ -476,12 +487,101 @@ def hornerEval(x, coefficientSequence):
 """
 Exercise 2.35
 """
+def sum(a,b):
+    return a+b
 def countLeaves(tree):
-    if not tree:
-        return 0
-    if isinstance(tree, int):
-        return 1
-    return countLeaves(tree[0]) + countLeaves(tree[1])
+    def func(x):
+        if isinstance(x,int):
+            return 1
+        return countLeaves(x)
+    return accumulate(sum,0,map(func,tree))
+
+
+
+testcountleaves = [1,2,3,[1,2,3,4]]
+
+# print(length(testcountleaves))
+# print(countLeaves(testcountleaves))
+
+"""
+Exercise 2.36
+"""
+
+def carofseqs(sequences):
+    list = []
+    for i in sequences:
+        list = list + [i[0]]
+    return list
+def cdrofseqs(sequences):
+    list = []
+    for i in sequences:
+        list = list + [i[1:]]
+    return list
+
+def accumulate_n(operation, init, sequences):
+    if not sequences[0]:
+        return []
+    return [accumulate(operation, init, carofseqs(sequences))] + accumulate_n(operation, init, cdrofseqs(sequences))
+
+testaccumulaten = [[1,2,3],[4,5,6],[7,8,9],[10,11,12]]
+# print(accumulate_n(sum, 0, testaccumulaten))
+
+"""
+Exercise 2.37
+"""
+def dotproduct(v,w):
+    list = []
+    for i in range(len(v)):
+        list = list + [v[i]*w[i]]
+    return accumulate(lambda x,y: x+y, 0, list)
+
+testdotproduct1 = [1,2,3]
+testdotproduct2 = [4,5,6]
+print(dotproduct(testdotproduct1, testdotproduct2))
+
+def matrixtimesvector(A,x):
+    return map(lambda y: dotproduct(y,x), A)
+
+def transpose(A):
+    return accumulate_n(lambda x,y: [x]+y, [], A)
+
+# testmatrix = [[1,2,3],[4,5,6],[7,8,9]]
+# print(transpose(testmatrix))
+
+def matrixmult(A,B):
+    return map(lambda x: matrixtimesvector(B,x), transpose(A))
+
+testmatrix1 = [[1,2,3],[4,5,6],[7,8,9]]
+testmatrix2 = [[1,2,3],[4,5,6],[7,8,9]]
+# print(matrixmult(testmatrix1, testmatrix2))
+
+"""
+Exercise 2.38
+
+3/2
+1/6
+[1,[2,[3,[]]]
+[[[],1],2],3]
+associativity
+"""
+def fold_left(op,init,seq):
+    if not seq:
+        return init
+    return fold_left(op, op(init, seq[0]), seq[1:])
+"""
+Exercise 2.39
+"""
+def reverse1(seq):
+    return accumulate(lambda x,y: y+[x], [], seq)
+def reverse2(seq):
+    return fold_left(lambda x,y: [y]+x, [], seq)
+
+testreverse = [1,2,3,4,5]
+print(reverse1(testreverse))
+print(reverse2(testreverse))
+
+
+
 
 
 
