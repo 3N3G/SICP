@@ -577,10 +577,59 @@ def reverse2(seq):
     return fold_left(lambda x,y: [y]+x, [], seq)
 
 testreverse = [1,2,3,4,5]
-print(reverse1(testreverse))
-print(reverse2(testreverse))
+# print(reverse1(testreverse))
+# print(reverse2(testreverse))
 
+"""
+Exercise 2.40
+"""
+def unique_pairs(n):
+    if n < 0:
+        return []
+    
+    sequence = []
+    for i in range(n):
+        for j in range(i):
+            sequence = sequence + [[i,j]]
+    return sequence
 
+def filter(condition, sequence):
+    seq2 = []
+    for i in sequence:
+        if condition(i):
+            seq2 = seq2 + [i]
+    return seq2
+def prime_sum_pairs(n):
+    sequence = unique_pairs(n)
+    return filter(lambda x: isPrime(x[0]+x[1]), sequence)
+
+"""
+Exercise 2.41
+"""
+def ordered_triples(n,s):
+    triples = []
+    for i in range(n):
+        for pair in unique_pairs(s):
+            triples = triples + [[i]+pair]
+            triples = triples + [pair + [i]]
+    return triples
+
+"""
+Exercise 2.42
+TODO: WRITE UP isSafe for queen positions!
+"""
+def queen_cols(k):
+    if k == 0:
+        return [[]]
+    trylist = [[]]
+    for i in range(k):
+        trylist = trylist + map(lambda x: x+[i], queen_cols(k-1))
+    #take list of queen_cols(k-1) and make a list with the kth row queen being each of 0 to k-1
+    #filter this list 
+    return filter (lambda y : isSafe(k,y), trylist)# list of possible placements for kth queen)
+
+def queens(board_size):
+    return queen_cols(board_size)
 
 
 
