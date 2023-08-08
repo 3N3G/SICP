@@ -537,7 +537,7 @@ def dotproduct(v,w):
 
 testdotproduct1 = [1,2,3]
 testdotproduct2 = [4,5,6]
-print(dotproduct(testdotproduct1, testdotproduct2))
+# print(dotproduct(testdotproduct1, testdotproduct2))
 
 def matrixtimesvector(A,x):
     return map(lambda y: dotproduct(y,x), A)
@@ -616,8 +616,16 @@ def ordered_triples(n,s):
 
 """
 Exercise 2.42
-TODO: WRITE UP isSafe for queen positions!
 """
+
+def isSafe(k, positions):
+    safe = True
+    for i in range(k-1):
+        if positions[i]==positions[k-1]:
+            safe = False
+        if positions[i]-positions[k-1]==i-k+1:
+            safe = False
+    return safe
 def queen_cols(k):
     if k == 0:
         return [[]]
@@ -631,6 +639,307 @@ def queen_cols(k):
 def queens(board_size):
     return queen_cols(board_size)
 
+"""
+Exercise 2.43
+
+This runs much more slowly since it repeats queen-cols again and again, redundantly. It should be 8^8 times slower.
+"""
 
 
+"""
+Exercise 2.44
+(define up-split painter n) (if (= n 0) painter (below (beside (up-split painter (- n 1)) (up-split painter (- n 1))) painter))
+"""
 
+"""
+Exercise 2.45
+(define split first second) (if (= n 0) painter (first (second (split painter (- n 1)) (split painter (- n 1))) painter))
+"""
+
+"""
+Exercise 2.46
+"""
+def make_vect(x,y):
+    return (x,y)
+
+def xcor_vect(v):
+    return v[0]
+def ycor_vect(v):
+    return v[1]
+
+def add_vect(v1,v2):
+    return make_vect(xcor_vect(v1)+xcor_vect(v2), ycor_vect(v1)+ycor_vect(v2))
+
+def sub_vect(v1,v2):
+    return make_vect(xcor_vect(v1)-xcor_vect(v2), ycor_vect(v1)-ycor_vect(v2))
+
+def scale_vect(v,s):
+    return make_vect(s*xcor_vect(v), s*ycor_vect(v))
+
+"""
+Exercise 2.47
+"""
+def make_frame(origin, edge1, edge2):
+    return [origin, edge1, edge2]
+def make_frame2(origin, edge1, edge2):
+    return [origin, [edge1, edge2]]
+
+frameconstructor = make_frame #can switch to make_frame2
+
+def origin_frame(frame):
+    return frame[0]
+    # return frame[0][0]
+def edge1_frame(frame):
+    return frame[1]
+    # return frame[1][0]
+def edge2_frame(frame):
+    return frame[2]
+    # return frame[1][1]
+
+"""
+Exercise 2.48
+"""
+
+def make_segment(start, end): # directed segment
+    return [start, end]
+def start_segment(segment):
+    return segment[0]
+def end_segment(segment):
+    return segment[1]
+
+"""
+Exercise 2.49
+"""
+v1 = make_vect(0,0)
+v2 = make_vect(1,0)
+v3 = make_vect(0,1)
+v4 = make_vect(1,1)
+
+# pretend draw_line exists and draws a line
+
+def segmentstopainters(segment_list):
+    def function(frame):
+        for segment in segment_list: 
+            draw_line(frame_coord_map(frame)(start_segment(segment)), frame_coord_map(frame)(end_segment(segment)))
+    return function
+
+# a)
+outline_paintera = segmentstopainters([make_segment(v1,v2),make_segment(v2,v4),make_segment(v4,v3),make_segment(v3,v1)])
+# b)
+outline_painterb = segmentstopainters([make_segment(v1,v4),make_segment(v2,v3)])
+# c)
+outline_painterc = segmentstopainters([make_segment(scale_vect(add_vect(v3,v1),.5),scale_vect(add_vect(v1,v2),.5)),make_segment(scale_vect(add_vect(v1,v2),.5),scale_vect(add_vect(v2,v4),.5)),make_segment(scale_vect(add_vect(v2,v4),.5),scale_vect(add_vect(v4,v3),.5)),make_segment(scale_vect(add_vect(v4,v3),.5),scale_vect(add_vect(v3,v1),.5))])
+# d) is pretty impossible without manually recording all the line segments that make up the wave image
+
+"""
+Exercise 2.50
+"""
+
+def transform_painter(painter, origin, corner1, corner2):
+    def transformation(frame):
+        m = frame_coord_map(frame)
+        new_origin = m(origin)
+        return painter(make_frame(new_origin, sub_vect(m(corner1), new_origin), sub_vect(m(corner2), new_origin)))
+    return transformation
+
+def flip_vert(painter):
+    return transform_painter(painter, make_vect(0,1),make_vect(1,1),make_vect(0,0))
+
+def flip_horiz(painter):
+    return transform_painter(painter, make_vect(1,0),make_vect(0,0),make_vect(1,1))
+
+def rotate90(painter): #counterclockwise
+    return transform_painter(painter, make_vect(1,0),make_vect(1,1),make_vect(0,0))
+
+def rotate180(painter):
+    def function(frame):
+        return rotate90(rotate90(painter))(frame)
+    return function
+
+def rotate270(painter):
+    def function(frame):
+        return rotate90(rotate90(rotate90(painter)))(frame)
+    return function
+
+"""
+Exercise 2.51
+"""
+def below1(painter1, painter2):
+    split_point = make_vect(0,0.5)
+    paint_left = transform_painter(painter1, make_vect(0,0),make_vect(1,0),split_point)
+    paint_right = transform_painter(painter2, split_point, make_vect(1,0.5),make_vect(0,1))
+    
+    def framefunc(frame):
+        paint_left(frame)
+        paint_right(frame)
+    return framefunc
+
+def below2(painter1, painter2): # assumes beside exists
+    return rotate270(beside(rotate90(painter1), rotate90(painter2)))
+
+"""
+Exercise 2.53
+(a b c)
+((george))
+((y1 y2))??
+(y1 y2)
+False
+False
+(red shoes blue socks)
+"""
+
+"""
+Exercise 2.54
+"""
+def equal(list1, list2):
+    if isinstance(list1,int) or isinstance(list2,int):
+        return list1 == list2
+    elif not list1 and not list2:
+        return True
+    elif not (list1 and list2):
+        return False
+    elif len(list1)==1 and len(list2)==1:
+        return list1[0] == list2[0]
+    return equal(list1[0],list2[0]) and equal(list1[1:],list2[1:])
+
+# print(equal((1,2,3,4),(1,2,3,4)))
+# print(equal((1,2,3,4),(1,2,3,5)))
+# print(equal((1,2,3,4),(1,2,(3,4))))
+
+"""
+Exercise 2.55
+
+This is because ''abracadabra is the item (quote (quote abracadabra)) and the first quote makes the things in the parentheses literally the list (quote abracadabra), thus car of it is quote.
+"""
+
+"""
+Exercise 2.56, 2.57, 2.58
+General differentiator using (+, a, b, c, ...) and (*, a, b, c, ...) notation. still should implement (a+b) notation
+"""
+
+def isVariable(x):
+    return isinstance(x,str) and len(x) == 1 # maybe need better implementation
+
+def isSameVariable(x,y):
+    return isVariable(x) and isVariable(y) and x==y
+
+def make_sum(a1,a2):
+    if not isinstance(a1,tuple) and not isinstance(a2,tuple):
+        if (a1.isnumeric() and a2.isnumeric()):
+            return str(int(a1)+int(a2))
+    elif a1 == "0":
+        return a2
+    elif a2 == "0":
+        return a1
+    return ('+',a1,a2)
+
+def make_product(a1,a2):
+    if (a1 == "0" or a2 == "0"):
+        return "0"
+    elif (a1 == "1"):
+        return a2
+    elif (a2 == "1"):
+        return a1
+    elif not isinstance(a1,tuple) and not isinstance(a2,tuple):
+
+        if (a1.isnumeric() and a2.isnumeric()):
+            return str(int(a1)*int(a2))
+    return ('*',a1,a2)
+
+def is_sum(x):
+    return isinstance(x,tuple) and x[0]=='+'
+
+def addend(s): #first thing summed
+    return s[1]
+
+def augend(s):
+    return accumulate(make_sum, "0", s[2:])
+
+def is_prod(x):
+    return isinstance(x,tuple) and x[0]=='*'
+
+def multiplier(p): #first thing multiplied
+    return p[1]
+
+def multiplicand(p): #second thing multiplied
+    return accumulate(make_product, "1", p[2:])
+
+def deriv(exp,var):
+    if not isinstance(exp,tuple):
+        if exp.isnumeric(): 
+            return "0"
+        if isVariable(exp):
+            if isSameVariable(exp,var):
+                return "1"
+            else:
+                return "0"
+    if is_sum(exp):
+        return make_sum(deriv(addend(exp),var), deriv(augend(exp),var))
+    if is_prod(exp):
+        return make_sum(make_product(multiplier(exp),deriv(multiplicand(exp),var)), make_product(deriv(multiplier(exp),var),multiplicand(exp)))
+
+print(deriv(("+",("*","x","x","x"),("*","2","x"),"1"),"x"))
+
+print(deriv("x","x"))
+
+"""
+Exercise 2.59
+"""
+def union_set(s1,s2):
+    unionset = s1
+    for i in s2:
+        adjoin_set(i,s2)
+    return unionset
+
+"""
+Exercise 2.60
+"""
+def is_element(S,e):
+    if not S:
+        return False
+    if S[0]==e:
+        return True
+    return is_element(S[1:],e) # just as efficient except probably slower realistically
+def adjoin_set(S,e):
+    return S+[e] # nominally more efficient
+def intersection_set(S1,S2):
+    filter(lambda x: is_element(S2,x), S1) # just as efficient
+def union_set(S1,S2):
+    return S1+S2 # more efficient
+
+"""
+Exercise 2.61
+"""
+def is_element_of_ordered_set(S,e):
+    if not S:
+        return False
+    if S[0]==e:
+        return True
+    if S[0]>e:
+        return False
+    return is_element(S[1:],e)
+
+def adjoin_set(S,e):
+    if not S:
+        return [e]
+    if S[0]==e:
+        return S
+    if S[0]>e:
+        return [e]+S
+    return S[0]+adjoin_set(S[1:],e)
+# faster by half
+def union_set(S1,S2):
+    if not S1:
+        return S2
+    if not S2:
+        return S1
+    if S1[0]==S2[0]:
+        return S1[0]+union_set(S1[1:],S2[1:])
+    if S1[0]>S2[0]:
+        return S2[0]+union_set(S1,S2[1:])
+    return S1[0]+union_set(S1[1:],S2)
+# faster by half
+
+"""
+Exercise 2.62
+"""
