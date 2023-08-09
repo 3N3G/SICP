@@ -878,9 +878,11 @@ def deriv(exp,var):
     if is_prod(exp):
         return make_sum(make_product(multiplier(exp),deriv(multiplicand(exp),var)), make_product(deriv(multiplier(exp),var),multiplicand(exp)))
 
-print(deriv(("+",("*","x","x","x"),("*","2","x"),"1"),"x"))
+# print(deriv(("+",("*","x","x","x"),("*","2","x"),"1"),"x"))
 
-print(deriv("x","x"))
+# print(deriv("x","x"))
+
+# print(deriv(("*","x","y"),"y"))
 
 """
 Exercise 2.59
@@ -943,3 +945,138 @@ def union_set(S1,S2):
 """
 Exercise 2.62
 """
+
+def make_tree(entry, left, right):
+    return (entry,left,right)
+
+def entry(tree):
+    try:
+        return tree[0]
+    except:
+        return ()
+def left_branch(tree):
+    try:
+        return tree[1]
+    except:
+        return ()
+def right_branch(tree):
+    try:
+        return tree[2]
+    except:
+        return ()
+
+def element_of_binary_tree_set(x,set):
+    if not set:
+        return False
+    if x==entry(set):
+        return True
+    if x<entry(set):
+        return element_of_binary_tree_set(x,left_branch(set))
+    return element_of_binary_tree_set(x,right_branch(set))
+
+"""
+Exercise 2.63
+"""
+def tree_to_list_1(tree):
+    if not tree:
+        return ()
+    elif isinstance(tree,int):
+        return (tree)
+    return tree_to_list_1(left_branch(tree)) + (entry(tree)) + tree_to_list_1(right_branch(tree))
+
+def tree_to_list_2(tree):
+    def copy_to_list(tree,result_list):
+        if not tree:
+            return result_list
+        elif isinstance(tree,int):
+            return (tree) , result_list
+        return copy_to_list(left_branch(tree), (entry(tree)) , copy_to_list(right_branch(tree), result_list))
+    return copy_to_list(tree,())
+
+left = make_tree(3,1,5)
+right = make_tree(9,[],11)
+tree = make_tree(7,left,right)
+# print(tree_to_list_1(tree))
+# print(tree_to_list_2(tree))
+"""
+a) These two methods should give the same result. They append left branch to entry to right branch.
+b) 
+The first method has log n steps, each of which require appending a list to a list, which is linear time. Thus the first method is O(nlogn).
+The second method only requires adding an element to a list, which is constant time, so the second method is O(n).
+"""
+
+"""
+Exercise 2.64
+"""
+def partial_tree(size, elements):
+    if size == 0:
+        return ((), elements)
+    left_size = (size-1)//2
+    left_result = partial_tree(left_size, elements)
+    left_tree = left_result[0]
+    non_left_elements = left_result[1]
+    right_size = size-left_size - 1 # -1 for entry
+    this_entry = non_left_elements[0]
+    right_result = partial_tree(right_size, non_left_elements[1:])
+    right_tree = right_result[0]
+    remaining_elements = right_result[1]
+    return make_tree(this_entry, left_tree, right_tree) , remaining_elements
+def list_to_tree(elements):
+    return partial_tree(len(elements), elements)
+
+testlist = (1,2,3,4,5,6,7,8,9,10)
+print(list_to_tree(testlist))
+"""
+       5
+     /    \
+    2      8
+   / \    / \
+  1   3  6   9
+     /    \   \
+    4      7   10
+"""
+
+"""
+Exercise 2.66
+"""
+
+
+def key(record):
+    return #something black box
+
+def lookup_list(givenkey, records):
+    if not records:
+        return False
+    elif givenkey == key(records[0]):
+        return records[0]
+    return lookup(givenkey, records[1:])
+
+def lookup_tree(givenkey,records):
+    if not records:
+        return False
+    elif givenkey == key(entry(records)):
+        return records
+    return lookup_tree(givenkey, left_branch(records)) or lookup_tree(givenkey, right_branch(records))
+
+"""
+Exercise 2.67
+"""
+
+def make_leaf(symbol,weight):
+    ("leaf",symbol,weight)
+
+def is_leaf(object):
+    if not object:
+        return False
+    return object[0]=="leaf"
+
+def symbol_leaf(x):
+    if not is_leaf(x):
+        raise Exception("Not a leaf")
+    return x[1]
+
+def weight_leaf(x):
+    if not is_leaf(x):
+        raise Exception("Not a leaf")
+    return x[2]
+    
